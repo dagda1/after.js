@@ -1,15 +1,19 @@
 import { matchPath } from 'react-router-dom';
-import { AfterRouteProps, InitialProps, AfterRouteComponentType, CtxBase } from './types';
+import { AfterRouteProps, InitialProps, CtxBase } from './types';
 import { isAfterComponent } from './utils';
 
-export async function loadInitialProps(routes: AfterRouteProps[], pathname: string, ctx: CtxBase): Promise<InitialProps> {
+export async function loadInitialProps(
+  routes: AfterRouteProps[],
+  pathname: string,
+  ctx: CtxBase
+): Promise<InitialProps> {
   const promises: Promise<any>[] = [];
 
   const matchedComponent = routes.find((route: AfterRouteProps) => {
     const match = matchPath(pathname, route);
 
     if (match && route.component && isAfterComponent(route.component)) {
-      const component = route.component as AfterRouteComponentType<any>;
+      const component = route.component;
 
       promises.push(
         component.load
@@ -20,7 +24,7 @@ export async function loadInitialProps(routes: AfterRouteProps[], pathname: stri
 
     return !!match;
   });
-  
+
   return {
     match: matchedComponent,
     data: (await Promise.all(promises))[0]
